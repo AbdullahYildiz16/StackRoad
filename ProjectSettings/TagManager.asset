@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Road
   - CurrentRoad
+  - ExtraRoad
   layers:
   - Default
   - TransparentFX

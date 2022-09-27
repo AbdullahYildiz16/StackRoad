@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlayerMove : MonoBehaviour
 {
-    public GameObject road;
+    public GameObject[] roadList;
     int roadAmount = 1;
     [SerializeField] float playerSpeed;
     void Update()
@@ -13,9 +13,10 @@ public class PlayerMove : MonoBehaviour
     }
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Road"))
+        if (other.CompareTag("Road") || other.CompareTag("CurrentRoad"))
         {
-            Instantiate(road, road.transform.position + Vector3.forward*roadAmount*2, Quaternion.identity);
+            int i = Random.Range(0, roadList.Length);
+            Instantiate(roadList[i], roadList[i].transform.position + Vector3.forward*roadAmount*2, Quaternion.identity);
             roadAmount++;
         }
     }
