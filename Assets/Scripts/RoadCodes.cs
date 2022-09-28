@@ -5,6 +5,7 @@ using UnityEngine;
 public class RoadCodes : MonoBehaviour
 {
     RoadCodes roadCodesScript;
+    Material roadMaterial;
     GameObject currentRoad;
     float xDistance = 3;
     float xSide;
@@ -14,10 +15,11 @@ public class RoadCodes : MonoBehaviour
 
     void Start()
     {
-        
+        roadMaterial = gameObject.GetComponent<MeshRenderer>().material;
         roadCodesScript = gameObject.GetComponent<RoadCodes>();
         currentRoad = GameObject.FindGameObjectWithTag("CurrentRoad");
-       xSide  = Random.Range(0,2);
+        
+        xSide  = Random.Range(0,2);
         if (xSide == 1f)
         {
             // 0 --> Cube is going right to left
@@ -26,6 +28,7 @@ public class RoadCodes : MonoBehaviour
         }
         if (gameObject.CompareTag("Road"))
         {
+            transform.localScale = new Vector3(currentRoad.transform.localScale.x, transform.localScale.y, transform.localScale.z);
             transform.position = transform.position + Vector3.right * xDistance;
         }
         
@@ -40,8 +43,16 @@ public class RoadCodes : MonoBehaviour
 
             float hangover = transform.position.x - currentRoad.transform.position.x;// hangover = |2x - y|  
             float direction = hangover > 0 ? 1f : -1f;
+            if (Mathf.Abs(hangover) >= (transform.localScale.x + currentRoad.transform.localScale.x) / 2)
+            {
+                gameObject.SetActive(false);
+            }
+            else
+            {
+                SplitRoad(hangover, direction);
+            }
 
-            SplitRoad(hangover, direction);
+            
 
             currentRoad.tag = "Road";
             gameObject.tag = "CurrentRoad";
@@ -73,14 +84,14 @@ public class RoadCodes : MonoBehaviour
     
     void SpawnExtraRoad(float fallingBlockXSize, float fallingBlockXPosition)
     {
-        
-        
-        GameObject original = Instantiate(gameObject, new Vector3(fallingBlockXPosition, transform.position.y, transform.position.z),
-            Quaternion.identity);
-        original.gameObject.tag = "ExtraRoad";
-        original.transform.localScale = new Vector3(fallingBlockXSize, transform.localScale.y, transform.localScale.z);
-        original.transform.GetComponent<Rigidbody>().useGravity = true;
-        original.transform.GetComponent<Rigidbody>().isKinematic = false;
+
+        GameObject extraRoad = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        extraRoad.transform.position = new Vector3(fallingBlockXPosition, transform.position.y, transform.position.z);
+        extraRoad.transform.localScale = new Vector3(fallingBlockXSize, transform.localScale.y, transform.localScale.z);
+        extraRoad.GetComponent<MeshRenderer>().material = roadMaterial;
+        extraRoad.AddComponent<Rigidbody>();
+        extraRoad.transform.GetComponent<Rigidbody>().useGravity = true;
+        extraRoad.transform.GetComponent<Rigidbody>().isKinematic = false;
 
     }
 }
